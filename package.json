@@ -13,5 +13,8 @@
     "Express"
   ],
   "author": "Daniel Flores Orozco",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
 }
