@@ -1,6 +1,9 @@
 const express = require('express');
+const initDB = require('./config/db');
+
 const app = express();
 const port = 9000;
+
 
 app.get('/', (req, res) => {
     res.send({
@@ -11,3 +14,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
      console.log('App is online')
  });
+
+ initDB();
