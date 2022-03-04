@@ -1,0 +1,17 @@
+{
+  "name": "backendhotel",
+  "version": "1.0.0",
+  "description": "This project is for the hotel system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "NodeJS",
+    "Moongose",
+    "MongoDB",
+    "Express"
+  ],
+  "author": "Daniel Flores Orozco",
+  "license": "ISC"
+}
