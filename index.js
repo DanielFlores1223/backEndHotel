@@ -1,5 +1,5 @@
 const express = require('express');
-const initDB = require('./config/db');
+const initDB = require('./database/config/db');
 
 const app = express();
 const port = 9000;
