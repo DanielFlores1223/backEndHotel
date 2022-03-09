@@ -11,7 +11,7 @@ const port = 9000;
 const additionalServicesRoute = require('./app/routes/additionalServices.routes');
 
 //USE ROUTES
-app.use( '/', additionalServicesRoute );
+app.use( '/api/', additionalServicesRoute );
 
 app.listen(port, () => {
      console.log('App is online')
