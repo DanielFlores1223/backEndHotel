@@ -26,6 +26,10 @@ const UserSchema = new mongoose.Schema(
           numerPhone: {
                type: String,
                required: true
+          },
+          status: {
+               type: Boolean,
+               default: true
           }
      }
 );

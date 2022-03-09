@@ -1,15 +1,17 @@
 const express = require('express');
-const initDB = require('./database/config/db');
+const bodyParser = require('body-parser');
+const initDB = require('./app/database/config/db');
 
 const app = express();
+app.use(bodyParser.urlencoded({extended:true}));
+app.use( express.json() );
 const port = 9000;
 
+//ROUTES
+const additionalServicesRoute = require('./app/routes/additionalServices.routes');
 
-app.get('/', (req, res) => {
-    res.send({
-        data: 'Hello World, I am working well'
-    });
-});
+//USE ROUTES
+app.use( '/', additionalServicesRoute );
 
 app.listen(port, () => {
      console.log('App is online')
