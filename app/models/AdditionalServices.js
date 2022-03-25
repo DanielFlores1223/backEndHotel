@@ -17,4 +17,4 @@ const AdditionalServicesSchema = new mongoose.Schema(
      }
 )
 
-module.exports = mongoose.model('AdditionalService', AdditionalServicesSchema);
+module.exports = mongoose.model('AdditionalServices', AdditionalServicesSchema);

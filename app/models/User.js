@@ -13,7 +13,12 @@ const UserSchema = new mongoose.Schema(
           },
           role : {
                type: String, 
-               required: true
+               required: true,
+               /*Admin, Receptionist,  customer */
+               enum: {
+                    values: ['Admin', 'Receptionist', 'Customer'],
+                    message: '{VALUE} only has three values "Admin", "Receptionist", "Customer"'
+               }
           }, 
           name : {
                type: String, 
@@ -23,7 +28,7 @@ const UserSchema = new mongoose.Schema(
                type: String, 
                required: true
           }, 
-          numerPhone: {
+          numberPhone: {
                type: String,
                required: true
           },
@@ -34,4 +39,4 @@ const UserSchema = new mongoose.Schema(
      }
 );
 
-module.exports = mongoose.model('user', UserSchema);
+module.exports = mongoose.model('Users', UserSchema);

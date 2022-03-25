@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const path = 'additionalService';
+const path = 'typeRoom';
 
-const controller = require('../controllers/additionalServices.controller');
+const controller = require('../controllers/typeRooms.controller');
 
 router.get(`/${path}s`, controller.findAll);
 router.get(`/${path}/:_id`, controller.findOneById);
