@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Customer = require('../models/Customers');
 const Receptionist = require('../models/Receptionists');
 
+const { createToken } = require('../common/functions/authorization');
+
 const nameModel = 'Users';
 
 const prueba = (req, res) => {
@@ -81,7 +83,9 @@ const login = async (req, res) => {
                                                      ] 
                                          } )
                                          .then( data => {
-                                             return { reqStatus: true, data }
+                                             return { reqStatus: true, 
+                                                      data,  
+                                                      msg: `${nameModel} logged - email - ${ data.email }`  }
                                          } )
                                          .catch( err => {
                                               return { reqStatus: false, err }
@@ -89,16 +93,22 @@ const login = async (req, res) => {
 
      const { reqStatus } = userFound;
      if ( !reqStatus ) {
-          return res.status(400).send( userFound )
+
+          return res.status(400).send( { reqStatus: false, err: 'user no identify' } )
      }
 
+     const { _id, role } = userFound;
      //crear el token
+     const token = createToken( _id, role, true );
 
+     const resUser = { ...userFound, token };
+     res.status(200).send( resUser );
 
 
 }
 
 module.exports = {
      prueba,
-     create
+     create,
+     login
 }
