@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const initDB = require('./app/database/config/db');
 
 const app = express();
 app.use( express.urlencoded({extended:true}) );
 app.use( express.json() );
+app.use( cors() );
 const port = 9000;
 const pathApi = '/api/';
 

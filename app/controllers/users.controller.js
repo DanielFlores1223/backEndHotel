@@ -32,7 +32,7 @@ const create = async (req, res) => {
           await newReceptionist.save().then( data => {
                res.status(200).send( { 
                                         reqStatus: true, 
-                                        data, 
+                                        data: { user: userCreated.data, receptionist: data }, 
                                         msg: `${nameModel} Receptionist - name - ${ data.idUser } was created` } );
           } )
           .catch( err => {
@@ -59,7 +59,7 @@ const create = async (req, res) => {
            await newCustomer.save().then( data => {
                res.status(200).send( { 
                     reqStatus: true, 
-                    data, 
+                    data: { user: userCreated.data, customer: data }, 
                     msg: `${nameModel} Customer - name - ${ data.idUser } was created` } );
                }
            )
@@ -98,7 +98,6 @@ const login = async (req, res) => {
      }
 
      const { _id, role } = userFound;
-     //crear el token
      const token = createToken( _id, role, true );
 
      const resUser = { ...userFound, token };
