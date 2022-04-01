@@ -1,28 +1,32 @@
 //TODO: ADD IMAGE
 const Model = require('../models/TypeRooms');
+const { validateMongoId } = require('../common/functions/validation-common');
 
 const nameModel = 'Type Rooms';
 
 const findAll = async ( req, res ) => {
-     const resComplete = await Model.find();
+     const result = await Model.find();
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
+                                    result, 
                                     msg: `${nameModel} found all` } );
 }
 
 const findOneById = async ( req, res ) => {
      const { _id } = req.params;
 
-     const resComplete = await Model.findById( _id );
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     const result = await Model.findById( _id );
+
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was found` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was found` } );
 }
 
 const create = async ( req, res ) => {
@@ -32,7 +36,7 @@ const create = async ( req, res ) => {
      await newModel.save()
                      .then( data => {
                          res.status(201).send( { reqStatus: true, 
-                              data, 
+                              result: data, 
                               msg: `${nameModel} - name - ${ data.name } was created`} );
                      })
                      .catch( err => {
@@ -45,6 +49,9 @@ const update = async ( req, res ) => {
      //TODO: add image
      const { _id } = req.params; 
 
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+
      const newModel = new Model( { ...req.body } ); 
 
      const modelReview = await newModel.validate()
@@ -53,26 +60,29 @@ const update = async ( req, res ) => {
 
      if ( !modelReview.validate ) return res.status(400).send( { reqStatus: false, errors: modelReview.err.errors } );
 
-     const resComplete = await Model.findByIdAndUpdate(_id, { ...req.body });
+     const result = await Model.findByIdAndUpdate(_id, { ...req.body });
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was updated` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was updated` } );
 
 }
 
 const deleteOne = async ( req, res ) => {
      const { _id } = req.params;
 
-     const resComplete = await Model.findByIdAndDelete( _id );
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     const result = await Model.findByIdAndDelete( _id );
+
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was deleted` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was deleted` } );
      
 }
 

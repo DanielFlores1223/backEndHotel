@@ -1,44 +1,51 @@
 const Model = require('../models/AdditionalServices');
+const { validateMongoId } = require('../common/functions/validation-common');
 const nameModel = 'Additional Service';
 
 const findAll = async ( req, res ) => {
-     const resComplete = await Model.find();
+     const result = await Model.find();
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
+                                    result, 
                                     msg: `${nameModel} found all` } );
 }
 
 const findOneById = async ( req, res ) => {
      const { _id } = req.params;
 
-     const resComplete = await Model.findById( _id );
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     const result = await Model.findById( _id );
+
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was found` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was found` } );
 }
 
 const create = async ( req, res ) => {
      
      const newModel = new Model( { ...req.body } );
-     const resComplete = await newModel.save();
+     const result = await newModel.save();
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was created` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was created` } );
 
 }
 
 const update = async ( req, res ) => {
      
      const { _id } = req.params; 
+
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
 
      const newModel = new Model( { ...req.body } ); 
      const { name, description, price } = newModel; 
@@ -48,13 +55,13 @@ const update = async ( req, res ) => {
           ( price === '' || price === null) ) 
           return res.status(400).send( { reqStatus: false, msg: 'All fields are required' } );
 
-     const resComplete = await Model.findByIdAndUpdate(_id, { ...req.body });
+     const result = await Model.findByIdAndUpdate(_id, { ...req.body });
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was updated` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was updated` } );
 
 }
 
@@ -62,13 +69,16 @@ const update = async ( req, res ) => {
 const deleteOne = async ( req, res ) => {
      const { _id } = req.params;
 
-     const resComplete = await Model.findByIdAndDelete( _id );
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
 
-     if ( !resComplete ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
+     const result = await Model.findByIdAndDelete( _id );
+
+     if ( !result ) return res.status(400).send( { reqStatus: false, msg: 'Error in the request' } );
 
      return res.status(201).send( { reqStatus: true, 
-                                    resComplete, 
-                                    msg: `${nameModel} - name - ${ resComplete.name } was deleted` } );
+                                    result, 
+                                    msg: `${nameModel} - name - ${ result.name } was deleted` } );
      
 }
 

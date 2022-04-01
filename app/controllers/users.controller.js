@@ -3,6 +3,7 @@ const Customer = require('../models/Customers');
 const Receptionist = require('../models/Receptionists');
 
 const { createToken } = require('../common/functions/authorization');
+const { validateMongoId } = require('../common/functions/validation-common');
 
 const nameModel = 'Users';
 
@@ -15,7 +16,7 @@ const create = async (req, res) => {
      const newUser = new User( { ...req.body } );
 
      const userCreated = await newUser.save().then( data => { return { reqStatus: true, 
-                                                   data, 
+                                                   result: data, 
                                                    msg: `${nameModel} - name - ${ data.name } was created`} } )
                                              .catch( err => { return { reqStatus: false, 
                                                                        err } } );
@@ -23,8 +24,8 @@ const create = async (req, res) => {
      if( !userCreated.reqStatus )
           return res.status(400).send( userCreated );
 
-     const { data } = userCreated;
-     const { role, _id } = data;
+     const { result } = userCreated;
+     const { role, _id } = result;
 
      if ( role === 'Receptionist' ) {
           const newReceptionist = new Receptionist( { idUser: _id, changeDB: [] } )
@@ -32,11 +33,11 @@ const create = async (req, res) => {
           await newReceptionist.save().then( data => {
                res.status(200).send( { 
                                         reqStatus: true, 
-                                        data: { user: userCreated.data, receptionist: data }, 
+                                        result: { user: userCreated.data, receptionist: data }, 
                                         msg: `${nameModel} Receptionist - name - ${ data.idUser } was created` } );
           } )
           .catch( err => {
-               res.status(400).send( { reqStatus: false, err } )
+               res.status(400).send( { reqStatus: false, msg: err } )
           });
           
           return;
@@ -59,12 +60,12 @@ const create = async (req, res) => {
            await newCustomer.save().then( data => {
                res.status(200).send( { 
                     reqStatus: true, 
-                    data: { user: userCreated.data, customer: data }, 
+                    result: { user: userCreated.data, customer: data }, 
                     msg: `${nameModel} Customer - name - ${ data.idUser } was created` } );
                }
            )
            .catch( err => {
-               res.status(400).send( { reqStatus: false, err } )
+               res.status(400).send( { reqStatus: false, msg: err } )
           });
 
           return;
@@ -84,17 +85,16 @@ const login = async (req, res) => {
                                          } )
                                          .then( data => {
                                              return { reqStatus: true, 
-                                                      data,  
+                                                      result: data,  
                                                       msg: `${nameModel} logged - email - ${ data.email }`  }
                                          } )
                                          .catch( err => {
-                                              return { reqStatus: false, err }
+                                              return { reqStatus: false, msg: err }
                                          } );
 
      const { reqStatus } = userFound;
      if ( !reqStatus ) {
-
-          return res.status(400).send( { reqStatus: false, err: 'user no identify' } )
+          return res.status(400).send( { reqStatus: false, msg: 'user no identify' } )
      }
 
      const { _id, role } = userFound;
@@ -106,8 +106,62 @@ const login = async (req, res) => {
 
 }
 
+const updateUser = async (req, res) => {
+
+     const { _id } = req.params;
+
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+
+     const userModified = await User.findByIdAndUpdate( _id, { ...req.body }, { new: true} );
+
+     if( !userModified ) 
+          return res.status(400).send( { reqStatus: false, msg: 'User not found' } );
+                                                    
+     res.status(200).send({ reqStatus: true, 
+                            result: userModified, 
+                            msg: `${nameModel} updated id - ${ userModified._id }` });
+      
+}
+
+const updateCustomer = async (req, res) => {
+     const { _id } = req.params;
+
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+
+     const customerModified = await Customer.findByIdAndUpdate( _id, { ...req.body }, { new: true} );
+
+     if( !customerModified ) 
+          return res.status(400).send( { reqStatus: false, msg: 'User not found' } );
+                                               
+     res.status(200).send({ reqStatus: true, 
+                       result: customerModified, 
+                       msg: `${nameModel} updated id - ${ customerModified._id }` });
+
+}
+
+const updateReceptionist = async ( req, res ) => {
+     const { _id } = req.params;
+
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+
+     const receptionistModified = await Receptionist.findByIdAndUpdate( _id, { ...req.body }, { new: true} );
+
+     if( !receptionistModified ) 
+          return res.status(400).send( { reqStatus: false, msg: 'User not found' } );
+                                               
+     res.status(200).send({ reqStatus: true, 
+                       result: receptionistModified, 
+                       msg: `${nameModel} updated id - ${ receptionistModified._id }` });
+} 
+
 module.exports = {
      prueba,
      create,
-     login
+     login,
+     updateUser,
+     updateCustomer,
+     updateReceptionist
 }
