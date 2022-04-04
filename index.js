@@ -13,14 +13,16 @@ const pathApi = '/api/';
 const additionalServicesRoute = require('./app/routes/additionalServices.routes');
 const typeRoomsRoute = require('./app/routes/typeRooms.routes');
 const usersRoute = require('./app/routes/users.routes');
+const reservationsRoute = require('./app/routes/reservations.routes');
 
 //USE ROUTES
 app.use( pathApi, additionalServicesRoute );
 app.use( pathApi, typeRoomsRoute );
 app.use( pathApi, usersRoute );
+app.use( pathApi, reservationsRoute );
 
 app.listen(port, () => {
-     console.log('App is online')
+     console.log('App is online, in port', port)
  });
 
  initDB();

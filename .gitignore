@@ -1,2 +1,2 @@
 /node_modules
-/database/config/credentials.js
+./database/config/credentials.js

@@ -7,10 +7,6 @@ const { validateMongoId } = require('../common/functions/validation-common');
 
 const nameModel = 'Users';
 
-const prueba = (req, res) => {
-     res.send({msg: 'hola'});
-}
-
 const create = async (req, res) => {
 
      const newUser = new User( { ...req.body } );
@@ -157,11 +153,63 @@ const updateReceptionist = async ( req, res ) => {
                        msg: `${nameModel} updated id - ${ receptionistModified._id }` });
 } 
 
+const deleteOne = async (req, res) => {
+     const { _id } = req.params;
+
+     if ( validateMongoId( _id ) ) 
+          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+
+     const userDeleted = await User.findByIdAndDelete( _id );
+
+     if (!userDeleted) 
+          return res.status(400).send( { reqStatus: false, msg: 'User not found' } );
+
+     const customerFound = Customer.findOne( { usedId: _id } );
+
+     if (customerFound) {
+          const customerDeleted = await Customer.findOneAndDelete( { usedId: _id } );
+          
+          if( !customerDeleted )
+               return res.status(400).send( { reqStatus: false, msg: 'Customer not found' } );
+
+          return res.status(200).send( { 
+                                         reqStatus: true, 
+                                         result: { userDeleted, customerDeleted } ,
+                                         msg: `Customer deleted with id ${userDeleted._id}` 
+                                        } 
+                                     );
+     }
+
+     const receptionistFound = await Receptionist.findOneAndDelete( { userId: _id } );
+
+     if ( receptionistFound ) {
+          const receptionistDeleted = await Receptionist.findOneAndDelete( { userId: _id } );
+
+          if( !receptionistDeleted )
+               return res.status(400).send( { reqStatus: false, msg: 'Receptionist not found' } );
+
+          return res.status(200).send( { 
+                                         reqStatus: true, 
+                                         result: { userDeleted, customerDeleted } ,
+                                         msg: `Receptionist deleted with id ${userDeleted._id}`
+                                       } 
+                                    );
+     }
+
+     return res.status(200).send( { 
+                                     reqStatus: true, 
+                                     result: { userDeleted } ,
+                                     msg: `Admin deleted with id ${userDeleted._id}`
+                                   } 
+                                );
+
+}
+
 module.exports = {
-     prueba,
      create,
      login,
      updateUser,
      updateCustomer,
-     updateReceptionist
+     updateReceptionist,
+     deleteOne
 }
