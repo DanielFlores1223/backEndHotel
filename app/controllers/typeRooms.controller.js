@@ -40,7 +40,7 @@ const create = async ( req, res ) => {
                               msg: `${nameModel} - name - ${ data.name } was created`} );
                      })
                      .catch( err => {
-                         res.status(400).send( { reqStatus: false, err } );
+                         res.status(400).send( { reqStatus: false, msg: err } );
                      })
 
 }
@@ -58,7 +58,7 @@ const update = async ( req, res ) => {
                                         .then( data => { return { validate: true, data } } )
                                         .catch( err => { return { validate: false, err} } );
 
-     if ( !modelReview.validate ) return res.status(400).send( { reqStatus: false, errors: modelReview.err.errors } );
+     if ( !modelReview.validate ) return res.status(400).send( { reqStatus: false, msg: modelReview.err.errors } );
 
      const result = await Model.findByIdAndUpdate(_id, { ...req.body });
 
