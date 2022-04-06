@@ -15,7 +15,7 @@ const create = async (req, res) => {
                                                    result: data, 
                                                    msg: `${nameModel} - name - ${ data.name } was created`} } )
                                              .catch( err => { return { reqStatus: false, 
-                                                                       err } } );
+                                                                       msg: err } } );
 
      if( !userCreated.reqStatus )
           return res.status(400).send( userCreated );
