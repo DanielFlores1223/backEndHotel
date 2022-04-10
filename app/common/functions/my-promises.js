@@ -1,4 +1,5 @@
 const { validateMongoId } = require('./validation-common');
+const fs = require('fs-extra');
 
 const waitSearchIds = async (arrayIds, Model) => {
      try {
@@ -26,7 +27,7 @@ const waitSearchIds = async (arrayIds, Model) => {
           return { success: true, arraySuccess, arrayErrorsId}
      
      } catch (error) {
-          throw { success: false, msg: 'There is an error!' };     
+          throw { success: false, error, msg: 'There is an error!' };     
      }
 }
 
@@ -58,11 +59,30 @@ const waitUpdateStatus = async (arrayIds, Model, status) => {
           return { success: true, arraySuccess, arrayErrorsId}
      
      } catch (error) {
-          throw { success: false, msg: 'There is an error!' };     
+          throw { success: false, error, msg: 'There is an error!' };     
+     }
+}
+
+const waitDeleteImagesFs = async (arrayPaths = []) => {
+     try {
+         await arrayPaths.reduce( async (previousPromise, path) => {
+          
+               await previousPromise
+
+                    await fs.remove(`./${path}`);    
+
+               return Promise.resolve()
+          }, Promise.resolve());
+
+          return { success: true, arrayPaths, msg: `All paths removed` }
+     
+     } catch (error) {
+          throw { success: false, error, msg: 'There is an error!' };     
      }
 }
 
 module.exports = {
      waitSearchIds,
-     waitUpdateStatus
+     waitUpdateStatus,
+     waitDeleteImagesFs
 }

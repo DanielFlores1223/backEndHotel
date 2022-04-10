@@ -18,7 +18,7 @@ const TypeRoomsSchema = mongoose.Schema(
                type: Number,
                required: true
           },
-          //picture: []
+          picture: []
      }
 );
 

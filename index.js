@@ -25,6 +25,9 @@ app.use( pathApi, reservationsRoute );
 app.use( pathApi, anomaliesRoute );
 app.use( pathApi, roomsRoute );
 
+//STATIC
+app.use('/uploads', express.static('uploads'));
+
 app.listen(port, () => {
      console.log('App is online, in port', port)
  });

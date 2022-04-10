@@ -1,2 +1,5 @@
 /node_modules
 ./database/config/credentials.js
+/uploads/*.jpg
+/uploads/*.png
+/uploads/*.jpeg
