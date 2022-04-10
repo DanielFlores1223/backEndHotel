@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 const CustomersSchema = mongoose.Schema(
      {
           idUser: {
-               type: String,
+               type: ObjectId,
                required: true   
           },
           address: {
@@ -17,7 +18,7 @@ const CustomersSchema = mongoose.Schema(
           reservations: [
                {
                     idRoom: {
-                         type: String,
+                         type: ObjectId,
                          required: true
                     },
                     startDate: {
@@ -63,7 +64,7 @@ const CustomersSchema = mongoose.Schema(
                                    }
                               },
                               dateTime: Date,
-                              idAdditionalService: String,
+                              idAdditionalService: ObjectId,
                               signatureCostumer: Boolean,
                               paid: Boolean,
                               methodPayment: {
@@ -89,7 +90,7 @@ const CustomersSchema = mongoose.Schema(
                     },
                     changeRoom: [
                          {
-                              idNewRoom: String,
+                              idNewRoom: ObjectId,
                               reasonChange: String
                          }
                     ],

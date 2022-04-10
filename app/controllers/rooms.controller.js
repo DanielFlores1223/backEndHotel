@@ -8,9 +8,9 @@ const findAll = async (req, res) => {
      const rooms = await Model.find({});
 
      if(!rooms)
-          return res.status(404).send({ reqStatus: false, msg: `${nameModel}s not found` });
+          return res.status(404).send({ success: false, msg: `${nameModel}s not found` });
 
-     res.status(200),send({ reqStatus: true, result: rooms, msg: `${nameModel}s found` });
+     res.status(200),send({ success: true, result: rooms, msg: `${nameModel}s found` });
 }
 
 const findById = async (req, res) => {
@@ -19,76 +19,87 @@ const findById = async (req, res) => {
      const room = await Model.findById(_id);
 
      if (!room) 
-          return res.status(404).send({ reqStatus: false, msg: `${nameModel} not found` });
+          return res.status(404).send({ success: false, msg: `${nameModel} not found` });
 
-     res.status(200),send({ reqStatus: true, result: romm, msg: `${nameModel} found with id - ${room._id}` });
+     res.status(200),send({ success: true, result: romm, msg: `${nameModel} found with id - ${room._id}` });
 }
 
 const create = async (req, res) => {
 
-     req.body.idTypeRoom = req.body.idTypeRoom.trim();
-     const { idTypeRoom } = req.body;
-
-     const typeRoom = await TypeRooms.findById(idTypeRoom);
-
-     if (!typeRoom) 
-          return res.status(400).send({ reqStatus: false, msg: 'Type room not found' });
+     try {
+          req.body.idTypeRoom = req.body.idTypeRoom.trim();
+          const { idTypeRoom } = req.body;
      
-     const newModel = new Model({...req.body});
-
-     const modelCreated = await newModel.save().then(
-                                                      data => { return { reqStatus: true, 
-                                                        result: data, 
-                                                        msg: `${nameModel} - name - ${ data.name } was created`} } )
-                                                .catch( err => { return { reqStatus: false, 
-                                                                           msg: err } } );
-     if (!modelCreated.reqStatus) 
-          return res.status(400).send(modelCreated);
+          const typeRoom = await TypeRooms.findById(idTypeRoom);
      
-     res.status(201).send(modelCreated);
+          if (!typeRoom) 
+               return res.status(404).send({ success: false, msg: 'Type room not found' });
+          
+          const newModel = new Model({...req.body});
+     
+          const result = await newModel.save();
+     
+          res.status(201).send({ success: true, 
+                                 result, 
+                                 msg: `${nameModel} - name - ${ result.name } was created`});   
+     } catch (error) {
+          res.status(400).send({ success: false, error ,msg: `Error in the request` });
+     }
+
+     
 }
 
 const update = async (req, res) => {
-     const { _id } = req.params;
 
-     if ( validateMongoId( _id ) ) 
-          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+     try {
+          const { _id } = req.params;
+
+          if ( validateMongoId( _id ) ) 
+               return res.status(400).send( { success: false, msg: 'Id is invalid' } );
      
-     if ( req.body.idTypeRoom ) {
-          const { idTypeRoom } = req.body;
-          const typeRoom = await TypeRooms.findById(idTypeRoom);
+          if ( req.body.idTypeRoom ) {
+               const { idTypeRoom } = req.body;
+               const typeRoom = await TypeRooms.findById(idTypeRoom);
 
-          if (!typeRoom) 
-               return res.status(400).send({ reqStatus: false, msg: 'Type room not found' });
-     }
+               if (!typeRoom) 
+                    return res.status(400).send({ success: false, msg: 'Type room not found' });
+          }
 
-     const roomModified = await Model.findByIdAndUpdate( _id, {...req.body}, {new: true} )
+          const result = await Model.findByIdAndUpdate( _id, {...req.body}, {new: true} )
 
-     if( !roomModified ) 
-          return res.status(400).send( { reqStatus: false, msg: `${nameModel} not found` } );
+          if( !result ) 
+               return res.status(404).send( { success: false, msg: `${nameModel} not found` } );
                                                     
-     res.status(200).send({ reqStatus: true, 
-                            result: roomModified, 
-                            msg: `${nameModel} updated id - ${ roomModified._id }` });
+          res.status(200).send({ success: true, 
+                                 result, 
+                                 msg: `${nameModel} updated id - ${ result._id }` });
+     } catch (error) {
+          res.status(400).send( { success: false, error, msg: `Error in the request` } );
+     }
 }
 
 const deleteOne = async (req, res) => {
-     const { _id } = req.params;
 
-     if ( validateMongoId( _id ) ) 
-          return res.status(400).send( { reqStatus: false, msg: 'Id is invalid' } );
+     try {
+          const { _id } = req.params;
 
-     const roomDeleted = await Model.findByIdAndDelete( _id );
+          if ( validateMongoId( _id ) ) 
+               return res.status(400).send( { success: false, msg: 'Id is invalid' } );
 
-     if (!roomDeleted)
-          return res.status(404).send( { reqStatus: false, msg: `${nameModel} not found` } );
+          const roomDeleted = await Model.findByIdAndDelete( _id );
 
-     res.status(200).send( { 
-                              reqStatus: true, 
+          if (!roomDeleted)   
+               return res.status(404).send( { success: false, msg: `${nameModel} not found` } );
+
+          res.status(200).send( { 
+                              success: true, 
                               result: roomDeleted ,
                               msg: `Room deleted with id ${roomDeleted._id}`
                             } 
                          );
+     } catch (error) {
+          res.status(400).send( { success: false, error, msg: `Error in the request` } );
+     }
 }
 
 module.exports = {

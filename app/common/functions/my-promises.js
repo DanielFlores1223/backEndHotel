@@ -10,23 +10,23 @@ const waitSearchIds = async (arrayIds, Model) => {
                await previousPromise
 
                if ( validateMongoId( idRoom ) ) 
-                    return arrayErrorsId = [...arrayErrorsId, { reqStatus: false, msg: 'Id is invalid', idRoom }];
+                    return arrayErrorsId = [...arrayErrorsId, { success: false, msg: 'Id is invalid', idRoom }];
                     
      
                const roomFound = await Model.findOne( {_id: idRoom} );
 
                if (!roomFound) 
-                    return arrayErrorsId = [...arrayErrorsId, { reqStatus: false, msg: 'Id room not found', idRoom }];
+                    return arrayErrorsId = [...arrayErrorsId, { success: false, msg: 'Id room not found', idRoom }];
      
                arraySuccess = [...arraySuccess, idRoom];
 
                return Promise.resolve()
           }, Promise.resolve());
 
-          return { reqStatus: true, arraySuccess, arrayErrorsId}
+          return { success: true, arraySuccess, arrayErrorsId}
      
      } catch (error) {
-          throw { reqStatus: false, msg: 'There is an error!' };     
+          throw { success: false, msg: 'There is an error!' };     
      }
 }
 
@@ -41,13 +41,13 @@ const waitUpdateStatus = async (arrayIds, Model, status) => {
                await previousPromise
 
                if ( validateMongoId( idRoom ) ) 
-                    return arrayErrorsId = [...arrayErrorsId, { reqStatus: false, msg: 'Id is invalid', idRoom }];
+                    return arrayErrorsId = [...arrayErrorsId, { success: false, msg: 'Id is invalid', idRoom }];
 
                
                const roomUpdated = await Model.findByIdAndUpdate( idRoom, { status }, { new: true } );
 
                if (!roomUpdated) 
-                    return arrayErrorsId = [...arrayErrorsId, { reqStatus: false, msg: 'Id room not found', idRoom }];
+                    return arrayErrorsId = [...arrayErrorsId, { success: false, msg: 'Id room not found', idRoom }];
      
                arraySuccess = [...arraySuccess, roomUpdated];
 
@@ -55,10 +55,10 @@ const waitUpdateStatus = async (arrayIds, Model, status) => {
 
           }, Promise.resolve());
 
-          return { reqStatus: true, arraySuccess, arrayErrorsId}
+          return { success: true, arraySuccess, arrayErrorsId}
      
      } catch (error) {
-          throw { reqStatus: false, msg: 'There is an error!' };     
+          throw { success: false, msg: 'There is an error!' };     
      }
 }
 
