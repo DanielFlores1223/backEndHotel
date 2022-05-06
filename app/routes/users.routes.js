@@ -12,6 +12,7 @@ router.delete(`/${path}/:_id`, controller.deleteOne);
 
 // CUSTOMER ROUTES
 router.put(`/${path}/customer/:_id`, controller.updateCustomer);
+router.post(`/${path}/customer`, controller.createCustomer);
 
 // RECEPTIONIST ROUTES
 router.put(`/${path}/receptionist/:_id`, controller.updateReceptionist);

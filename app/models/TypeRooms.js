@@ -5,10 +5,10 @@ const TypeRoomsSchema = mongoose.Schema(
           name: {
                type: String,
                required: true,
-               enum: {
-                    values: ['Simple', 'Junior', 'Suite Imperial' ],
-                    message: '{VALUE} only has three values "Sencilla", "Junior" or "Suite Imperial"'
-               }
+          },
+          guests: {
+               type: Number,
+               required: true
           },
           features: {
                type: String,

@@ -5,12 +5,12 @@ const TypeRooms = require('../models/TypeRooms');
 const { validateMongoId } = require('../common/functions/validation-common');
 
 const findAll = async (req, res) => {
-     const rooms = await Model.find({});
+     const rooms = await Model.find({}).populate('idTypeRoom');
 
      if(!rooms)
           return res.status(404).send({ success: false, msg: `${nameModel}s not found` });
 
-     res.status(200),send({ success: true, result: rooms, msg: `${nameModel}s found` });
+     res.status(200).send({ success: true, result: rooms, msg: `${nameModel}s found` });
 }
 
 const findById = async (req, res) => {
@@ -21,7 +21,7 @@ const findById = async (req, res) => {
      if (!room) 
           return res.status(404).send({ success: false, msg: `${nameModel} not found` });
 
-     res.status(200),send({ success: true, result: romm, msg: `${nameModel} found with id - ${room._id}` });
+     res.status(200).send({ success: true, result: room, msg: `${nameModel} found with id - ${room._id}` });
 }
 
 const create = async (req, res) => {
@@ -35,6 +35,8 @@ const create = async (req, res) => {
           if (!typeRoom) 
                return res.status(404).send({ success: false, msg: 'Type room not found' });
           
+          //DEFAULT VALUES
+          req.body.status = 'available';
           const newModel = new Model({...req.body});
      
           const result = await newModel.save();
@@ -74,6 +76,10 @@ const update = async (req, res) => {
                                  result, 
                                  msg: `${nameModel} updated id - ${ result._id }` });
      } catch (error) {
+
+          if(error.codeName == 'DuplicateKey')
+               return res.status(400).send( { success: false, error, msg: `Error in the request: ${error.keyValue.name} already exists` } );
+
           res.status(400).send( { success: false, error, msg: `Error in the request` } );
      }
 }

@@ -76,6 +76,54 @@ const create = async (req, res) => {
      res.status(200).send(userCreated)
 }
 
+const createCustomer = async (req, res) => {
+
+     req.body.password = await bcrypt.hash( req.body.password, saltBy );
+     req.body.role = 'Customer';
+     const newUser = new User( { ...req.body } );
+
+     const userCreated = await newUser.save().then( data => { return { success: true, 
+                                                   result: data, 
+                                                   msg: `${nameModel} - name - ${ data.name } was created`} } )
+                                             .catch( err => { return { success: false, 
+                                                                       msg: err } } );
+
+     if( !userCreated.success )
+          return res.status(400).send( userCreated );
+
+     const { result } = userCreated;
+     const { role, _id } = result;
+
+     if( role === 'Customer' ) {
+          const newCustomer = new Customer( { 
+               idUser: _id,
+               address: {
+                    street: '',
+                    colony: '',
+                    externalNumber: '',
+                    internalNumber: ''
+               },
+               city: '',
+               country: '',
+               reservations: [],
+           } );
+
+           await newCustomer.save().then( data => {
+               res.status(200).send( { 
+                    success: true, 
+                    result: { user: userCreated.data, customer: data }, 
+                    msg: `${nameModel} Customer - name - ${ data.idUser } was created` } );
+               }
+           )
+           .catch( err => {
+               res.status(400).send( { success: false, msg: err } )
+          });
+
+          return;
+     }
+
+}
+
 const login = async (req, res) => {
      try {
           const { email, password } = req.body;
@@ -234,5 +282,6 @@ module.exports = {
      updateUser,
      updateCustomer,
      updateReceptionist,
-     deleteOne
+     deleteOne,
+     createCustomer
 }

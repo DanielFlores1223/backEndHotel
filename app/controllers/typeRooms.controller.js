@@ -31,12 +31,14 @@ const findOneById = async ( req, res ) => {
 
 const create = async ( req, res ) => {
      try {
+          console.log(req.body.image);
+          console.log(req.files)
           let arrayPaths = [];
           const { files } = req;
           let errorType = false;
 
-          if (!files)
-               return res.status(400).send({ success: false, msg: 'There are not images' });
+          if (!files || files.length === 0)
+               return res.status(400).send({ success: false, msg: 'There are not images', ot: req.body.image });
 
           files.forEach( image => {
 

@@ -4,7 +4,8 @@ const { ObjectId } = mongoose.Types;
 const RoomSchema = mongoose.Schema({
      name: {
           type: String,
-          required: true
+          required: true,
+          unique: true
      },
      floor: {
           type: Number,
@@ -17,11 +18,12 @@ const RoomSchema = mongoose.Schema({
                message: '{VALUE} only has three values "available", "unavailable", "in repaired"'
           }
      },
-
      idTypeRoom: {
           type: ObjectId,
-          required: true
-     }
+          required: true,
+          ref: 'TypeRomms'
+     },
+     daysOff: []
 });
 
 module.exports = mongoose.model('Rooms', RoomSchema);
