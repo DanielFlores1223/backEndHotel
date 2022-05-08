@@ -16,8 +16,8 @@ const findAll = async (req, res) => {
 const findById = async (req, res) => {
      const { _id } = req.params;
 
-     const room = await Model.findById(_id);
-
+     const room = await Model.findById(_id).populate('idTypeRoom');
+ 
      if (!room) 
           return res.status(404).send({ success: false, msg: `${nameModel} not found` });
 
