@@ -138,7 +138,7 @@ const addPictures = async (req, res) => {
           });
 
           if ( errorType )
-               return res.status(400).send({ success: false, msg: 'every file have to be images' });
+               return res.status(400).send({ success: false, msg: 'every file has to be images' });
 
           const typeRoom = await Model.findById(_id);
 

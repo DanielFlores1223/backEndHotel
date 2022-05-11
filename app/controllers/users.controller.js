@@ -199,6 +199,7 @@ const updateReceptionist = async ( req, res ) => {
 
      try {
           const { _id } = req.params;
+          console.log(_id)
 
           if ( validateMongoId( _id ) ) 
                return res.status(400).send( { success: false, msg: 'Id is invalid' } );
@@ -276,6 +277,30 @@ const deleteOne = async (req, res) => {
      
 }
 
+const searchFilterOr = async (req, res) => {
+     const { filter1, value1, filter2, value2 } = req.body;
+
+     try {
+          const result = await User.find( { '$or': [ { [`${filter1}`] : value1 }, { [`${filter2}`] : value2 } ] } );
+
+          res.status(200).send({ success: true, result, msg: 'All users found' });
+     } catch (error) {
+          res.status(400).send({ success: true, error, msg: 'Something was wrong...' });
+     }
+}
+
+const searchFilter = async (req, res) => {
+     const { filter, value } = req.body;
+
+     try {
+          const result = await User.find( { [`${filter}`] : value });
+
+          res.status(200).send({ success: true, result, msg: 'All users found' });
+     } catch (error) {
+          res.status(400).send({ success: true, error, msg: 'Something was wrong...' });
+     }
+}
+
 module.exports = {
      create,
      login,
@@ -283,5 +308,7 @@ module.exports = {
      updateCustomer,
      updateReceptionist,
      deleteOne,
-     createCustomer
+     createCustomer,
+     searchFilterOr,
+     searchFilter
 }

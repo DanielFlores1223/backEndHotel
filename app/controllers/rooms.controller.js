@@ -3,6 +3,7 @@ const nameModel = 'Room';
 
 const TypeRooms = require('../models/TypeRooms');
 const { validateMongoId } = require('../common/functions/validation-common');
+const Rooms = require('../models/Rooms');
 
 const findAll = async (req, res) => {
      const rooms = await Model.find({}).populate('idTypeRoom');
@@ -22,6 +23,82 @@ const findById = async (req, res) => {
           return res.status(404).send({ success: false, msg: `${nameModel} not found` });
 
      res.status(200).send({ success: true, result: room, msg: `${nameModel} found with id - ${room._id}` });
+}
+
+const findAvailabeByDates = async (req, res) => {
+
+     const dateStart = new Date( req.body.startDate );
+     const dateFinish = new Date( req.body.finishDate );
+
+      //First date in the request body
+      let fechasOff = [new Date( req.body.startDate )];
+      let flag = false
+
+      // Add days to date start
+      let nextDate = new Date(dateStart.setDate(dateStart.getDate() + 1)).toISOString();
+      while ( !flag ) {
+                
+           if ( new Date(nextDate).getTime() === dateFinish.getTime() ) {
+                fechasOff = [...fechasOff, dateFinish];                     
+                flag = true;
+                break;
+           }
+
+           fechasOff = [...fechasOff, new Date(nextDate)];
+           nextDate = new Date(new Date(nextDate).setDate( new Date(nextDate).getDate() + 1)).toISOString();
+      }
+
+     const allRooms = await Rooms.find({});
+
+     let floorArray = [];
+     for (let i = 0; i < allRooms.length; i++) {
+          floorArray = [...floorArray, allRooms[i]._doc.floor  ]
+     }
+
+     const all = await Rooms.find({ idTypeRoom: req.body.idTypeRoom });
+
+     let arrayRooms = [];
+
+     for (let i = 0; i < all.length; i++) {
+          arrayRooms = [...arrayRooms, { ...all[i]._doc }]
+          
+     }
+     
+     arrayRooms.forEach( (r,index) => {
+          arrayRooms[index].availableToReservation = true;
+
+          if (r.status !== 'available') {
+               arrayRooms[index].availableToReservation = false;
+          }
+
+          r.daysOff.forEach( (doff) => {
+
+               fechasOff.forEach( foff => {
+                    if (doff.getTime() == foff.getTime()) {
+                         arrayRooms[index].availableToReservation = false;
+                    }
+               } );
+               
+          });
+     });
+
+     //get max floor of rooms
+     const floorMax = Math.max(...floorArray);
+     const floorMin = Math.min(...floorArray);
+     console.log(floorMax)
+
+     let arrayFloorNumber = [];
+     let result = [];
+     for (let i = floorMin; i <= floorMax; i++) {
+          arrayFloorNumber = [ ...arrayFloorNumber, i];
+          const roomsFloor = arrayRooms.filter( r => r.floor === i );
+          console.log(roomsFloor);
+          result = [...result, { [`floor${i}`]: roomsFloor }];
+     }
+
+
+
+     res.status(200).send({ success: true, result, msg: `Rooms availabe for reservation found`})
 }
 
 const create = async (req, res) => {
@@ -113,5 +190,6 @@ module.exports = {
      findById,
      create,
      update,
-     deleteOne
+     deleteOne,
+     findAvailabeByDates
 }

@@ -81,8 +81,28 @@ const waitDeleteImagesFs = async (arrayPaths = []) => {
      }
 }
 
+const waitCreateDatesOffRooms = async (arrayIds = [], fechasOff = [], Model) => {
+     try {
+          await arrayIds.reduce( async (previousPromise, _id) => {
+           
+                await previousPromise
+                    const room = await Model.findById(_id);
+                    room.daysOff = [ ...room.daysOff, ...fechasOff ];
+                    
+                    await room.save();
+                return Promise.resolve()
+           }, Promise.resolve());
+ 
+           return { success: true, arrayIds, msg: `All Dates were added in each room` }
+      
+      } catch (error) {
+           throw { success: false, error, msg: 'There is an error!' };     
+      }
+}
+
 module.exports = {
      waitSearchIds,
      waitUpdateStatus,
-     waitDeleteImagesFs
+     waitDeleteImagesFs,
+     waitCreateDatesOffRooms
 }

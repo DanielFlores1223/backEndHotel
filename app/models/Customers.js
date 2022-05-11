@@ -17,8 +17,8 @@ const CustomersSchema = mongoose.Schema(
           country: String,
           reservations: [
                {
-                    idRoom: {
-                         type: ObjectId,
+                    idRooms: {
+                         type: Array,
                          required: true
                     },
                     startDate: {

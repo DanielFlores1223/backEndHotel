@@ -3,25 +3,34 @@ const nameModel = 'Customer'
 
 const Room = require('../models/Rooms');
 const AdditionalService = require('../models/AdditionalServices');
+const { waitSearchIds, waitUpdateStatus, waitCreateDatesOffRooms } = require('../common/functions/my-promises');
 
 const createReservation = async(req, res) => {
 
      try {
           const { _id } = req.params;
-          const { methodPayment, idRoom } = req.body;
+          const { methodPayment, idRooms } = req.body;
 
-          const customerFound = await Customer.findOne({idUser: _id})
+          const arrayIds = idRooms.split(',');
+          req.body.idRooms = [];
 
+          //Search room in the db
+          const correctIds = await waitSearchIds(arrayIds, Room); 
+          req.body.idRooms = correctIds.arraySuccess;
+          
+          const customerFound = await Customer.findOne({idUser: _id});
+          
           if ( !customerFound ) 
                return res.status(400).send( { success: false, msg: `${nameModel} not found` } );
 
-          const roomFound = await Room.findById( idRoom );
+          //Validate if the rooms exist in the db
+          if ( !correctIds.success )
+               return res.status(404).send( correctIds )         
 
-          if ( !roomFound ) 
-               return res.status(400).send( { success: false, msg: `Room not found` } );
+          if ( correctIds.arrayErrorsId.length > 0)  
+                return res.status(400).send({ success: false, error: correctIds.arrayErrorsId });        
 
-          if (roomFound.status !== 'available') 
-               return res.status(400).send( { success: false, msg: `Room is unavailable` } );
+          req.body.rooms = correctIds.arraySuccess;
 
           if(methodPayment === 'Card') {
                const { reference, typeCreditCard } = req.body;
@@ -47,12 +56,37 @@ const createReservation = async(req, res) => {
 
           const result = await customerFound.save();
 
-          await Room.findByIdAndUpdate(idRoom, { status: 'unavailable' });
+          const dateStart = new Date( req.body.startDate );
+          const dateFinish = new Date( req.body.finishDate );
+
+          //First date in the request body
+          let fechasOff = [new Date( req.body.startDate )];
+          let flag = false
+
+          // Add days to date start
+          let nextDate = new Date(dateStart.setDate(dateStart.getDate() + 1)).toISOString();
+          while ( !flag ) {
+                    
+               if ( new Date(nextDate).getTime() === dateFinish.getTime() ) {
+                    fechasOff = [...fechasOff, dateFinish];                     
+                    flag = true;
+                    break;
+               }
+
+               fechasOff = [...fechasOff, new Date(nextDate)];
+               nextDate = new Date(new Date(nextDate).setDate( new Date(nextDate).getDate() + 1)).toISOString();
+          }
+
+          //Save dates in days off array
+          const resultDatesRoom = await waitCreateDatesOffRooms(req.body.idRooms, fechasOff, Room);
+          if (!resultDatesRoom.success) 
+               return res.status(400).send( { success: false , msg: `There is a error with the rooms` } );
 
           res.status(201).send( {  success: true, 
                                    result, 
-                                   msg: `${nameModel} - Reresevation id - ${ result._id } was created`} );
+                                   msg: `${nameModel} - Reresevation was created`} );
      } catch (error) {
+          console.log(error)
           res.status(400).send( { success: false, error ,msg: `Error in the request` } );
      }
 }
